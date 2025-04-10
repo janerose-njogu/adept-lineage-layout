@@ -1,0 +1,8 @@
+node_modules/
+dist/
+build/
+*.log
+.vscode
+*.tsbuildinfo 
+tsconfig.tsbuildinfo
+coverage/
