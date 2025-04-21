@@ -1,8 +1,15 @@
 /*
- * Uses user-specified positions or hints as a starting point for the layout, 
- * allowing for a more intuitive and less disruptive layout process. 
-*/
-import { LayoutConfig, LineageNode, LineageEdge, LayeredGraph } from "../../types/lineage";
+ * Uses user-specified positions or hints as a starting point for the layout,
+ * allowing for a more intuitive and less disruptive layout process.
+ */
+import {
+  LayoutConfig,
+  LineageNode,
+  LineageEdge,
+  LayeredGraph,
+} from "@/src/interfaces/hierarchic";
+import { useHierarchicDPStore } from "@/src/stores/useHierarchicDPStore";
+
 
 export class FromSketchLayerer {
   constructor() {}
@@ -28,7 +35,7 @@ export class FromSketchLayerer {
     );
     return node.position.y + 0.5 * (height + adjustedSize);
   }
-  assignNodesToLayers(
+  private assignNodesToLayers(
     nodes: LineageNode[],
     edges: LineageEdge[],
     layoutConfig: LayoutConfig
