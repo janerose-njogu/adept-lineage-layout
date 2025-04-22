@@ -49,8 +49,8 @@ export interface TraversalResult {
 export interface LayoutConfig {
   minNodeSize: number;
   maxNodeSize: number;
-  nodeHaloVal: number;
-  nodeScaleFactor: number;
+  horizontalSpacing: number;
+  verticalSpacing: number;
 }
 
 export interface LayeredGraph {

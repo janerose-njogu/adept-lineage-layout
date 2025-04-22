@@ -68,7 +68,6 @@ export class HierarchicLayout {
   get layoutOrientation(): LayoutOrientation {
     return this._layoutOrientation;
   }
-
   set gridSpacing(spacing: number) {
     this._gridSpacing = spacing;
   }
@@ -114,7 +113,6 @@ export class HierarchicLayout {
   get enableProcessWithConstraints() {
     return this._enableProcessWithConstraints;
   }
-  // TODO: DefaultDrawingDistanceCalculator
   setGraphNodes(nodes: Node[]): void {
     this._graphNodes = nodes;
   }
@@ -152,64 +150,13 @@ export class HierarchicLayout {
       e.id === updatedEdge.id ? updatedEdge : e
     );
   }
-  private groupNodesByLayer(
-    nodeLayers: Map<string, number>
-  ): Record<number, string[]> {
-    const layerMap: Record<number, string[]> = {};
-    for (const [nodeId, layer] of nodeLayers.entries()) {
-      if (!layerMap[layer]) {
-        layerMap[layer] = [];
-      }
-      layerMap[layer].push(nodeId);
+  executeLayout(): Record<
+    string,
+    {
+      x: number;
+      y: number;
     }
-    return layerMap;
-  }
-  private getLayerIndexes(layerMap: Record<number, string[]>): number[] {
-    return Object.keys(layerMap)
-      .map(Number)
-      .sort((a, b) => a - b);
-  }
-  private getLayerCount(layerMap: Record<number, string[]>): number {
-    return Object.keys(layerMap).length;
-  }
-  private orderNodesWithinLayers(
-    layerMap: Record<number, string[]>,
-    nodeChildren: Map<string, string[]>
-  ): Record<number, string[]> {
-    // TODO:  improve it even further with: Median heuristics (median of parents’ positions)
-    const orderedLayerMap: Record<number, string[]> = {};
-
-    for (const layer of Object.keys(layerMap)
-      .map(Number)
-      .sort((a, b) => a - b)) {
-      const nodesInLayer = layerMap[layer];
-
-      // Sort nodes by number of incoming edges (nodes with more incoming edges later)
-      const sortedNodes = [...nodesInLayer].sort((a, b) => {
-        const aIncoming = this.countIncomingEdges(a, nodeChildren);
-        const bIncoming = this.countIncomingEdges(b, nodeChildren);
-        return aIncoming - bIncoming;
-      });
-
-      orderedLayerMap[layer] = sortedNodes;
-    }
-
-    return orderedLayerMap;
-  }
-
-  private countIncomingEdges(
-    nodeId: string,
-    nodeChildren: Map<string, string[]>
-  ): number {
-    let count = 0;
-    for (const [parent, children] of nodeChildren.entries()) {
-      if (children.includes(nodeId)) {
-        count++;
-      }
-    }
-    return count;
-  }
-  executeLayout() {
+  > {
     // TRAVERSE GRAPH
     const traversal = new GraphTraversal();
     const startNodes = traversal.findStartNodes(
@@ -250,19 +197,97 @@ export class HierarchicLayout {
 
     // LAYERING - LAYER ORDERING
     const layerMap = this.groupNodesByLayer(traversalStack.nodeLayers);
-    console.log("layerMap", layerMap);
 
-    const orderedLayers = this.getLayerIndexes(layerMap);
-    console.log("orderedLayers", orderedLayers);
+    // const orderedLayers = this.getLayerIndexes(layerMap);
 
-    const layerCount = this.getLayerCount(layerMap);
-    console.log("layerCount", layerCount);
+    // const layerCount = this.getLayerCount(layerMap);
 
     // NODE ORDERING WITHIN LAYERS
     const orderedLayerMap = this.orderNodesWithinLayers(
       layerMap,
       traversalStack.nodeChildren
     );
-    console.log("orderedLayerMap", orderedLayerMap);
+
+    // ASSIGN NODE POSITIONS
+    const nodePositions = this.assignNodePositions(orderedLayerMap);
+    return nodePositions;
+  }
+  private groupNodesByLayer(
+    nodeLayers: Map<string, number>
+  ): Record<number, string[]> {
+    const layerMap: Record<number, string[]> = {};
+    for (const [nodeId, layer] of nodeLayers.entries()) {
+      if (!layerMap[layer]) {
+        layerMap[layer] = [];
+      }
+      layerMap[layer].push(nodeId);
+    }
+    return layerMap;
+  }
+  // private getLayerIndexes(layerMap: Record<number, string[]>): number[] {
+  //   return Object.keys(layerMap)
+  //     .map(Number)
+  //     .sort((a, b) => a - b);
+  // }
+  // private getLayerCount(layerMap: Record<number, string[]>): number {
+  //   return Object.keys(layerMap).length;
+  // }
+  private orderNodesWithinLayers(
+    layerMap: Record<number, string[]>,
+    nodeChildren: Map<string, string[]>
+  ): Record<number, string[]> {
+    // TODO:  improve this with: Median heuristics (median of parents’ positions) or BARYCENTER heuristics (average of parents’ positions)
+    const orderedLayerMap: Record<number, string[]> = {};
+
+    for (const layer of Object.keys(layerMap)
+      .map(Number)
+      .sort((a, b) => a - b)) {
+      const nodesInLayer = layerMap[layer];
+
+      // Sort nodes by number of incoming edges (nodes with more incoming edges later)
+      const sortedNodes = [...nodesInLayer].sort((a, b) => {
+        const aIncoming = this.countIncomingEdges(a, nodeChildren);
+        const bIncoming = this.countIncomingEdges(b, nodeChildren);
+        return aIncoming - bIncoming;
+      });
+
+      orderedLayerMap[layer] = sortedNodes;
+    }
+
+    return orderedLayerMap;
+  }
+
+  private countIncomingEdges(
+    nodeId: string,
+    nodeChildren: Map<string, string[]>
+  ): number {
+    let count = 0;
+    for (const [_, children] of nodeChildren.entries()) {
+      if (children.includes(nodeId)) {
+        count++;
+      }
+    }
+    return count;
+  }
+  private assignNodePositions(
+    orderedLayerMap: Record<number, string[]>
+  ): Record<string, { x: number; y: number }> {
+    const positions: Record<string, { x: number; y: number }> = {};
+
+    for (const [layerIndex, layer] of Object.entries(orderedLayerMap)) {
+      const layerNum = Number(layerIndex);
+
+      const nodesInLayer = orderedLayerMap[layerNum];
+
+      for (let i = 0; i < nodesInLayer.length; i++) {
+        const nodeId = nodesInLayer[i];
+        const x = layerNum * this._layoutConfig.horizontalSpacing; // Layer controls x-axis (left → right)
+        const y = i * this._layoutConfig.verticalSpacing; // Position inside layer controls y-axis (top → bottom)
+
+        positions[nodeId] = { x, y };
+      }
+    }
+
+    return positions;
   }
 }
