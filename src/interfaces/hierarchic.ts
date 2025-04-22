@@ -1,4 +1,4 @@
-import { CoordinateExtent, Edge } from "@xyflow/react";
+import { CoordinateExtent, Node } from "@xyflow/react";
 import { HierarchicalLayoutLayerType } from "../types";
 
 interface NodeData {
@@ -10,9 +10,9 @@ export interface LineageNode {
   id: string;
   elementId?: string;
   position: { x: number; y: number };
-  width: number;
-  height: number;
-  data?: NodeData;
+  width?: number|undefined;
+  height?: number|undefined;
+  data?: Record<string, unknown> | undefined;
   sourceHandles?: string[];
   targetHandles?: string[];
   className?: string;
@@ -28,15 +28,24 @@ export interface LineageEdge {
   hidden?: boolean;
   source: string; //startNodeElementId
   target: string; //endNodeElementId
-  sourceHandle?: string;
-  targetHandle?: string;
+  sourceHandle?: string|null|undefined;
+  targetHandle?: string|null|undefined;
 }
 export interface DataProvider {
   graphData: Record<string, any>;
   setData: (key: string, value: any) => void;
   getData: (key: string) => any;
 }
-
+export interface StackEntry {
+  node: Node;
+  parent: Node | null;
+  depth: number;
+}
+export interface TraversalResult {
+  rootNode: string|null;
+  nodeChildren: Map<string, string[]>;
+  nodeLayers: Map<string, number>;
+}
 export interface LayoutConfig {
   minNodeSize: number;
   maxNodeSize: number;

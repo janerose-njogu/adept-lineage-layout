@@ -1,1 +1,1 @@
-export * from './hierarchic/index';
+export { HierarchicLayout } from "./HierarchicLayout";

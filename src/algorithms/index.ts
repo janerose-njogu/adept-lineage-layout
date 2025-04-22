@@ -1,1 +1,1 @@
-export { Dfs } from "./Dfs";
+export { GraphTraversal } from "./GraphTraversal";

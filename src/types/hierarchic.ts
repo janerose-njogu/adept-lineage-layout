@@ -1,3 +1,8 @@
+export enum DfsTraversalState {
+  WHITE = 0, // unvisited
+  GRAY = 1, // visiting
+  BLACK = 2, // visited
+}
 /*
  * The ComponentArrangementPolicy defines how a hierarchic layout algorithm arranges connected components within a graph.
  * It dictates how isolated groups of nodes and edges, not directly connected to the main graph, are handled during the layout process.
@@ -34,3 +39,12 @@ export type HierarchicalLayoutLayerType =
   | "UPPER_GROUP_CONNECTOR_NODES"
   | "SOURCE_GROUP_NODES"
   | "TARGET_GROUP_NODES";
+
+/*
+ * Specify how layout elements are arranged, either vertically or horizontally.
+ */
+export type LayoutOrientation =
+  | "BOTTOM_TO_TOP"
+  | "TOP_TO_BOTTOM"
+  | "LEFT_TO_RIGHT"
+  | "RIGHT_TO_LEFT";
