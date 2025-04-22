@@ -36,9 +36,9 @@ export default function Flow() {
   const [edges, setEdges, onEdgesChange] = useEdgesState(
     lineageEdges as Edge[]
   );
-  const hierarchicLayout = new HierarchicLayout(nodes, edges, layoutConfig);
   useEffect(() => {
     if (nodes.length > 0) {
+      const hierarchicLayout = new HierarchicLayout(nodes, edges, layoutConfig);
       const positions = hierarchicLayout.executeLayout();
       console.log("Positions: ", positions);
 
