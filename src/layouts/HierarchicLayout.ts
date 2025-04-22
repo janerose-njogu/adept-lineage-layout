@@ -2,16 +2,10 @@ import {
   LayoutConfig,
   LineageNode,
   LineageEdge,
-  EdgePriorities,
   TraversalResult,
 } from "@/src/interfaces";
 import { Node, Edge } from "@xyflow/react";
-import {
-  ComponentArrangementPolicy,
-  LayeringStrategy,
-  WeightHeuristic,
-  LayoutOrientation,
-} from "@/src/types";
+import { WeightHeuristic, LayoutOrientation } from "@/src/types";
 import { GraphTraversal } from "@/src/algorithms";
 
 export class HierarchicLayout {
@@ -21,77 +15,50 @@ export class HierarchicLayout {
   private _layoutOrientation: LayoutOrientation;
 
   private _gridSpacing: number;
+  private _horizontalSpacing: number;
+  private _verticalSpacing: number;
   private _minimumLayerDistance: number;
-  private _arrangementPolicy: ComponentArrangementPolicy;
-  private _layeringStrategy: LayeringStrategy;
   private _weightHeuristic: WeightHeuristic;
-  private _enableProcessWithConstraints: boolean;
 
   constructor(nodes: Node[], edges: Edge[], layoutConfig: LayoutConfig) {
     this._graphNodes = nodes;
     this._graphEdges = edges;
     this._layoutConfig = layoutConfig;
-    this._layoutOrientation = "LEFT_TO_RIGHT";
-    this._minimumLayerDistance = 20;
+    this._layoutOrientation = layoutConfig.layoutOrientation;
+    this._minimumLayerDistance = layoutConfig.minimumLayerDistance;
 
     // disable grid spacing by default
     this._gridSpacing = 0;
-    this._arrangementPolicy = "COMPACT";
-    this._layeringStrategy = "DEFAULT";
+    this._horizontalSpacing = layoutConfig.horizontalSpacing;
+    this._verticalSpacing = layoutConfig.verticalSpacing;
 
     this._weightHeuristic = "BARYCENTER";
-
-    this._enableProcessWithConstraints = false;
   }
-  set arrangementPolicy(policy: ComponentArrangementPolicy) {
-    this._arrangementPolicy = policy;
+  get layoutConfig(): LayoutConfig {
+    return this._layoutConfig;
   }
-  get arrangementPolicy() {
-    return this._arrangementPolicy;
+  set layoutConfig(config: LayoutConfig) {
+    this._layoutConfig = config;
   }
   get gridSpacing(): number {
     return this._gridSpacing;
   }
+  set gridSpacing(spacing: number) {
+    this._gridSpacing = spacing;
+  }
   set layoutOrientation(orientation: LayoutOrientation) {
-    if (
-      orientation !== "BOTTOM_TO_TOP" &&
-      orientation !== "TOP_TO_BOTTOM" &&
-      orientation !== "LEFT_TO_RIGHT" &&
-      orientation !== "RIGHT_TO_LEFT"
-    ) {
-      throw new Error(
-        "Invalid layout orientation. Must be one of: BOTTOM_TO_TOP, TOP_TO_BOTTOM, LEFT_TO_RIGHT, RIGHT_TO_LEFT."
-      );
+    if (orientation !== "TB" && orientation !== "LR") {
+      throw new Error("Invalid layout orientation. Must be one of: TB or LR.");
     }
     this._layoutOrientation = orientation;
   }
   get layoutOrientation(): LayoutOrientation {
     return this._layoutOrientation;
   }
-  set gridSpacing(spacing: number) {
-    this._gridSpacing = spacing;
-  }
-  set layeringStrategy(strategy: LayeringStrategy) {
-    if (
-      strategy !== "TOPOLOGICAL" &&
-      strategy !== "BFS" &&
-      strategy !== "WEIGHTED" &&
-      strategy !== "DEFAULT"
-    ) {
-      throw new Error(
-        "Invalid layering strategy. Must be one of: TOPOLOGICAL, BFS, WEIGHTED, DEFAULT."
-      );
-    }
-    this._layeringStrategy = strategy;
-  }
-  get layeringStrategy() {
-    return this._layeringStrategy;
-  }
   get weightHeuristic() {
     return this._weightHeuristic;
   }
   set weightHeuristic(heuristic: WeightHeuristic) {
-    //$p1
     if (heuristic !== "BARYCENTER" && heuristic !== "MEDIAN") {
       throw new Error("Invalid weight heuristic value.");
     }
@@ -107,12 +74,25 @@ export class HierarchicLayout {
       throw new Error("Negative minimum layer distance: " + minLayerDistance);
     this._minimumLayerDistance = minLayerDistance;
   }
-  set enableProcessWithConstraints(processWithContraints: boolean) {
-    this._enableProcessWithConstraints = processWithContraints;
+  get horizontalSpacing() {
+    // The horizontal distance between nodes in the same layer
+    return this._horizontalSpacing;
   }
-  get enableProcessWithConstraints() {
-    return this._enableProcessWithConstraints;
+  set horizontalSpacing(spacing: number) {
+    // The horizontal distance between nodes in the same layer
+    if (spacing < 0) throw new Error("Negative horizontal spacing: " + spacing);
+    this._horizontalSpacing = spacing;
   }
+  get verticalSpacing() {
+    // The vertical distance between nodes in the same layer
+    return this._verticalSpacing;
+  }
+  set verticalSpacing(spacing: number) {
+    // The vertical distance between nodes in the same layer
+    if (spacing < 0) throw new Error("Negative vertical spacing: " + spacing);
+    this._verticalSpacing = spacing;
+  }
+
   setGraphNodes(nodes: Node[]): void {
     this._graphNodes = nodes;
   }
@@ -269,20 +249,25 @@ export class HierarchicLayout {
     }
     return count;
   }
-  private assignNodePositions(
-    orderedLayerMap: Record<number, string[]>
-  ): Record<string, { x: number; y: number }> {
+  private assignNodePositions(orderedLayerMap: Record<number, string[]>) {
     const positions: Record<string, { x: number; y: number }> = {};
-
-    for (const [layerIndex, layer] of Object.entries(orderedLayerMap)) {
+    for (const [layerIndex, _] of Object.entries(orderedLayerMap)) {
       const layerNum = Number(layerIndex);
-
       const nodesInLayer = orderedLayerMap[layerNum];
 
       for (let i = 0; i < nodesInLayer.length; i++) {
         const nodeId = nodesInLayer[i];
-        const x = layerNum * this._layoutConfig.horizontalSpacing; // Layer controls x-axis (left → right)
-        const y = i * this._layoutConfig.verticalSpacing; // Position inside layer controls y-axis (top → bottom)
+
+        let x = 0;
+        let y = 0;
+
+        if (this._layoutOrientation === "LR") {
+          x = i * this._horizontalSpacing;
+          y = layerNum * (this._verticalSpacing + this._minimumLayerDistance);
+        } else if (this._layoutOrientation === "TB") {
+          x = layerNum * (this._horizontalSpacing + this._minimumLayerDistance);
+          y = i * this._verticalSpacing;
+        }
 
         positions[nodeId] = { x, y };
       }

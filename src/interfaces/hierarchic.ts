@@ -1,17 +1,16 @@
 import { CoordinateExtent, Node } from "@xyflow/react";
-import { HierarchicalLayoutLayerType } from "../types";
+import { LayoutOrientation } from "../types";
 
 interface NodeData {
   fixed?: boolean;
-  layerType?: HierarchicalLayoutLayerType;
 }
 interface EdgeData {}
 export interface LineageNode {
   id: string;
   elementId?: string;
   position: { x: number; y: number };
-  width?: number|undefined;
-  height?: number|undefined;
+  width?: number | undefined;
+  height?: number | undefined;
   data?: Record<string, unknown> | undefined;
   sourceHandles?: string[];
   targetHandles?: string[];
@@ -28,8 +27,8 @@ export interface LineageEdge {
   hidden?: boolean;
   source: string; //startNodeElementId
   target: string; //endNodeElementId
-  sourceHandle?: string|null|undefined;
-  targetHandle?: string|null|undefined;
+  sourceHandle?: string | null | undefined;
+  targetHandle?: string | null | undefined;
 }
 export interface DataProvider {
   graphData: Record<string, any>;
@@ -42,42 +41,16 @@ export interface StackEntry {
   depth: number;
 }
 export interface TraversalResult {
-  rootNode: string|null;
+  rootNode: string | null;
   nodeChildren: Map<string, string[]>;
   nodeLayers: Map<string, number>;
 }
 export interface LayoutConfig {
-  minNodeSize: number;
-  maxNodeSize: number;
+  nodeWidth: number;
+  nodeHeight: number;
   horizontalSpacing: number;
   verticalSpacing: number;
+  layoutOrientation: LayoutOrientation;
+  minimumLayerDistance: number;
 }
 
-export interface LayeredGraph {
-  [layerIndex: number]: LineageNode[];
-}
-
-export interface LayerNodeMap {
-  layeredGraph: LayeredGraph;
-  reversedEdges: LineageEdge[];
-  layerCount: number;
-}
-
-export interface LayerNodeWeights {
-  [layerIndex: number]: {
-    [nodeId: string]: number;
-  };
-}
-export interface LayerEdgeWeights {
-  [layerIndex: number]: {
-    [edgeId: string]: number;
-  };
-}
-export interface LayerNodeOrders {
-  [layerIndex: number]: {
-    [nodeId: string]: number;
-  };
-}
-export interface EdgePriorities {
-  [edgeId: string]: number;
-}

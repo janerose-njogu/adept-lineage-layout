@@ -17,10 +17,12 @@ import lineageNodes from "@/data/talendNodes.json";
 import lineageEdges from "@/data/talendEdges.json";
 
 const layoutConfig: LayoutConfig = {
-  minNodeSize: 10,
-  maxNodeSize: 300,
+  nodeWidth: 300,
+  nodeHeight: 300,
   horizontalSpacing: 500,
   verticalSpacing: 500,
+  layoutOrientation: "LR",
+  minimumLayerDistance: 20,
 };
 
 export default function Flow() {
@@ -71,7 +73,7 @@ export default function Flow() {
       >
         <MiniMap
           nodeStrokeWidth={3}
-          nodeColor="#e2e2e2"
+          nodeColor="#0000FF"
           pannable={true}
           zoomable={true}
         />
