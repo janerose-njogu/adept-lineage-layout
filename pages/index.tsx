@@ -1,9 +1,9 @@
-import Flow from '@/pages/Lineage';
+import FlowCanvas from '@/pages/FlowCanvas';
 
 export default function Lineage() {
   return (
     <main>
-      <Flow />
+      <FlowCanvas />
     </main>
   );
 }
