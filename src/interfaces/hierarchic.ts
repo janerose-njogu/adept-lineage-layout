@@ -1,9 +1,7 @@
 import { CoordinateExtent, Node } from "@xyflow/react";
 import { LayoutOrientation } from "../types";
 
-interface NodeData {
-  fixed?: boolean;
-}
+
 interface EdgeData {}
 export interface LineageNode {
   id: string;
@@ -25,8 +23,8 @@ export interface LineageEdge {
   type?: string;
   data?: EdgeData;
   hidden?: boolean;
-  source: string; //startNodeElementId
-  target: string; //endNodeElementId
+  source: string;
+  target: string;
   sourceHandle?: string | null | undefined;
   targetHandle?: string | null | undefined;
 }
@@ -53,4 +51,3 @@ export interface LayoutConfig {
   layoutOrientation: LayoutOrientation;
   minimumLayerDistance: number;
 }
-
