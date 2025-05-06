@@ -53,7 +53,7 @@ export class GraphTraversal {
       this.stateMap.set(node.id, DfsTraversalState.WHITE);
     }
 
-    let depth = 0;
+    let depth = 1; // depth starts at 1 to allow isolated nodes to be at depth 0
     stack.push({ node: startNode, parent: null, depth });
 
     while (stack.length > 0 && !this.isCancelled) {
