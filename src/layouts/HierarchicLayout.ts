@@ -206,7 +206,6 @@ export class HierarchicLayout {
     );
     // ASSIGN NODE POSITIONS
     const nodePositions = this.assignNodePositions(orderedLayerMap);
-    console.log("Node Positions", nodePositions);
     return nodePositions;
   }
 }
