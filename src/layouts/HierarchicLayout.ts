@@ -113,35 +113,41 @@ export class HierarchicLayout {
   }
   private assignNodePositions(orderedLayerMap: Record<number, string[]>) {
     const positions: Record<string, { x: number; y: number }> = {};
-    const defaultNodeWidth = this._layoutConfig.nodeWidth;
-    const defaultNodeHeight = this._layoutConfig.nodeHeight;
     for (const [layerIndex, nodeIds] of Object.entries(orderedLayerMap)) {
       const layerNum = Number(layerIndex);
-
+      let currentX = 0;
+      let currentY = 0;
+      let previousNodeWidth = 0;
+      let previousNodeHeight = 0;
       for (let i = 0; i < nodeIds.length; i++) {
         const nodeId = nodeIds[i];
         const node = this._graphNodes.find((n) => n.id === nodeId);
-        const nodeWidth = node?.measured?.width ?? defaultNodeWidth;
-        const nodeHeight = node?.measured?.height ?? defaultNodeHeight;
+        const nodeWidth = node?.measured?.width ?? this._layoutConfig.nodeWidth;
+        const nodeHeight =
+          node?.measured?.height ?? this._layoutConfig.nodeHeight;
 
-        let x = 0;
-        let y = 0;
-
-        if (this._layoutOrientation === "TB") {
-          x = i * (nodeWidth + this._horizontalSpacing);
-          y =
+        if (this._layoutOrientation === "LR") {
+          currentX =
             layerNum *
-            (nodeHeight + this._verticalSpacing + this._minimumLayerDistance);
-        } else if (this._layoutOrientation === "LR") {
-          x =
+            (previousNodeWidth +
+              this._horizontalSpacing +
+              this._minimumLayerDistance);
+          currentY += i === 0 ? 0 : previousNodeHeight + this._verticalSpacing;
+        } else if (this._layoutOrientation === "TB") {
+          currentX += i === 0 ? 0 : previousNodeWidth + this._horizontalSpacing;
+          currentY =
             layerNum *
-            (nodeWidth + this._horizontalSpacing + this._minimumLayerDistance);
-          y = i * (nodeHeight + this._verticalSpacing);
+            (previousNodeHeight +
+              this._verticalSpacing +
+              this._minimumLayerDistance);
         }
-        positions[nodeId] = { x, y };
+
+        positions[nodeId] = { x: currentX, y: currentY };
+
+        previousNodeWidth = nodeWidth;
+        previousNodeHeight = nodeHeight;
       }
     }
-
     return positions;
   }
   executeLayout(): Record<
