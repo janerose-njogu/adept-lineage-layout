@@ -1,7 +1,7 @@
 {
   "name": "@eon-collective/adept-layout-library",
   "repository": "github:eon-collective/adept-lineage-layout",
-  "version": "0.1.9",
+  "version": "0.2.0",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/@eon-collective"
   },

@@ -127,19 +127,19 @@ export class HierarchicLayout {
           node?.measured?.height ?? this._layoutConfig.nodeHeight;
 
         if (this._layoutOrientation === "LR") {
-          currentX =
-            layerNum *
-            (previousNodeWidth +
-              this._horizontalSpacing +
-              this._minimumLayerDistance);
-          currentY += i === 0 ? 0 : previousNodeHeight + this._verticalSpacing;
-        } else if (this._layoutOrientation === "TB") {
           currentX += i === 0 ? 0 : previousNodeWidth + this._horizontalSpacing;
           currentY =
             layerNum *
             (previousNodeHeight +
               this._verticalSpacing +
               this._minimumLayerDistance);
+        } else if (this._layoutOrientation === "TB") {
+          currentX =
+            layerNum *
+            (previousNodeWidth +
+              this._horizontalSpacing +
+              this._minimumLayerDistance);
+          currentY += i === 0 ? 0 : previousNodeHeight + this._verticalSpacing;
         }
 
         positions[nodeId] = { x: currentX, y: currentY };
