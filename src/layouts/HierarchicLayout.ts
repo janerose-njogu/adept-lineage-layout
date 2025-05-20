@@ -113,12 +113,22 @@ export class HierarchicLayout {
   }
   private assignNodePositions(orderedLayerMap: Record<number, string[]>) {
     const positions: Record<string, { x: number; y: number }> = {};
+
+    // Calculate maximum dimensions for consistent spacing
+    const maxNodeWidth = Math.max(
+      ...this._graphNodes.map(
+        (node) => node?.measured?.width ?? this._layoutConfig.nodeWidth
+      )
+    );
+    const maxNodeHeight = Math.max(
+      ...this._graphNodes.map(
+        (node) => node?.measured?.height ?? this._layoutConfig.nodeHeight
+      )
+    );
+
     for (const [layerIndex, nodeIds] of Object.entries(orderedLayerMap)) {
       const layerNum = Number(layerIndex);
-      let currentX = 0;
-      let currentY = 0;
-      let previousNodeWidth = 0;
-      let previousNodeHeight = 0;
+
       for (let i = 0; i < nodeIds.length; i++) {
         const nodeId = nodeIds[i];
         const node = this._graphNodes.find((n) => n.id === nodeId);
@@ -126,28 +136,35 @@ export class HierarchicLayout {
         const nodeHeight =
           node?.measured?.height ?? this._layoutConfig.nodeHeight;
 
+        let x = 0;
+        let y = 0;
+
         if (this._layoutOrientation === "LR") {
-          currentX += i === 0 ? 0 : previousNodeWidth + this._horizontalSpacing;
-          currentY =
+          // Left-to-Right: layers spread horizontally, nodes stack vertically
+          x =
             layerNum *
-            (previousNodeHeight +
-              this._verticalSpacing +
-              this._minimumLayerDistance);
-        } else if (this._layoutOrientation === "TB") {
-          currentX =
-            layerNum *
-            (previousNodeWidth +
+            (maxNodeWidth +
               this._horizontalSpacing +
               this._minimumLayerDistance);
-          currentY += i === 0 ? 0 : previousNodeHeight + this._verticalSpacing;
+          y = i * (maxNodeHeight + this._verticalSpacing);
+        } else if (this._layoutOrientation === "TB") {
+          // Top-to-Bottom: layers spread vertically, nodes spread horizontally
+          x = i * (maxNodeWidth + this._horizontalSpacing);
+          y =
+            layerNum *
+            (maxNodeHeight +
+              this._verticalSpacing +
+              this._minimumLayerDistance);
         }
 
-        positions[nodeId] = { x: currentX, y: currentY };
+        // Center the node within its allocated space
+        x += (maxNodeWidth - nodeWidth) / 2;
+        y += (maxNodeHeight - nodeHeight) / 2;
 
-        previousNodeWidth = nodeWidth;
-        previousNodeHeight = nodeHeight;
+        positions[nodeId] = { x, y };
       }
     }
+
     return positions;
   }
   executeLayout(): Record<
