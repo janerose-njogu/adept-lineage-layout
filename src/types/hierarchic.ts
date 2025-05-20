@@ -3,6 +3,11 @@ export enum DfsTraversalState {
   GRAY = 1, // visiting
   BLACK = 2, // visited
 }
+export enum BfsTraversalState {
+  WHITE = "WHITE", // Unvisited
+  GRAY = "GRAY", // Discovered but not fully processed
+  BLACK = "BLACK", // Fully processed
+}
 /*
  * The WeightHeuristic (SequencerWeightHeuristic) determines how the algorithm prioritizes different graph elements during layout or routing.
  * This influences the order and placement of graph elements during the layout process.

@@ -1,7 +1,7 @@
 import { LayoutConfig, TraversalResult } from "@/src/interfaces";
 import { Node, Edge } from "@xyflow/react";
 import { WeightHeuristic, LayoutOrientation } from "@/src/types";
-import { GraphTraversal } from "@/src/algorithms";
+import { BfsTraversal, DfsTraversal } from "@/src/algorithms";
 
 export class HierarchicLayout {
   private _graphNodes: Node[];
@@ -158,7 +158,10 @@ export class HierarchicLayout {
     }
   > {
     // TRAVERSE GRAPH
-    const traversal = new GraphTraversal();
+    const traversal =
+      this._layoutOrientation === "TB"
+        ? new DfsTraversal() // Deep, vertical hierarchy
+        : new BfsTraversal(); // Broad, horizontal layout
     const startNodes = traversal.findStartNodes(
       this._graphNodes,
       this._graphEdges
@@ -211,7 +214,6 @@ export class HierarchicLayout {
       traversalStack.nodeChildren
     );
     // ASSIGN NODE POSITIONS
-    const nodePositions = this.assignNodePositions(orderedLayerMap);
-    return nodePositions;
+    return this.assignNodePositions(orderedLayerMap);
   }
 }
