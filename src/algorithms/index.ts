@@ -1,2 +1,2 @@
-export { BfsTraversal } from "./BfsTraversal";
-export { DfsTraversal } from "./DfsTraversal";
+export { BfsTraversal } from "./bfs-traversal";
+export { DfsTraversal } from "./dfs-traversal";

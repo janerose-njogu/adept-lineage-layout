@@ -3,7 +3,7 @@ import { Node, Edge } from "@xyflow/react";
 import { WeightHeuristic, LayoutOrientation } from "@/src/types";
 import { BfsTraversal, DfsTraversal } from "@/src/algorithms";
 
-export class HierarchicLayout {
+export class Hierarchic {
   private _graphNodes: Node[];
   private _graphEdges: Edge[];
   private _layoutConfig: LayoutConfig;
