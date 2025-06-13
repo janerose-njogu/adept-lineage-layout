@@ -10,17 +10,22 @@ import {
   Controls,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useState, useRef, useEffect, useCallback } from "react";
-import { HierarchicLayout } from "@/src/layouts";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import { Hierarchic } from "@/src/index";
 import { LayoutConfig } from "@/src/interfaces";
-import lineageNodes from "@/data/talendNodes.json";
-import lineageEdges from "@/data/talendEdges.json";
+import { executeLayout } from "@/src/workers/layout-worker";
+import LineageEdge from "./LineageEdge";
+// import lineageNodes from "@/data/talendNodes.json";
+// import lineageEdges from "@/data/talendEdges.json";
+import lineageNodes from "@/data/dummyNodes";
+import lineageEdges from "@/data/dummyEdges";
+export type LayoutOrientation = "TB" | "LR";
 
 const layoutConfig: LayoutConfig = {
   nodeWidth: 300,
   nodeHeight: 300,
-  horizontalSpacing: 500,
-  verticalSpacing: 500,
+  horizontalSpacing: 0,
+  verticalSpacing: 0,
   layoutOrientation: "LR",
   minimumLayerDistance: 20,
 };
@@ -35,22 +40,30 @@ export default function FlowCanvas() {
   const [edges, setEdges, onEdgesChange] = useEdgesState(
     lineageEdges as Edge[]
   );
-  const hierarchicLayout = new HierarchicLayout(nodes, edges, layoutConfig);
+  const hierarchicLayout = new Hierarchic(nodes, edges, layoutConfig);
   useEffect(() => {
     if (nodes.length > 0) {
-      const positions = hierarchicLayout.executeLayout();
-      setNodes((prevNodes) =>
-        prevNodes.map((node) => {
-          const pos = positions[node.id];
-          if (pos) {
-            return {
-              ...node,
-              position: positions[node.id] || node.position,
-            };
-          }
-          return node;
-        })
-      );
+      // const positions = hierarchicLayout.executeLayout();
+      executeLayout({
+        nodes,
+        edges,
+        layoutConfig,
+        layoutType: "hierarchic",
+      }).then((positions) => {
+        console.log("Positions from worker:", positions);
+        setNodes((prevNodes) =>
+          prevNodes.map((node) => {
+            const pos = positions[node.id];
+            if (pos) {
+              return {
+                ...node,
+                position: positions[node.id] || node.position,
+              };
+            }
+            return node;
+          })
+        );
+      });
     }
   }, []);
   const onNodeMouseEnter = useCallback(
@@ -74,8 +87,22 @@ export default function FlowCanvas() {
           })
         );
       }
-    },
-    [setNodes]
+      setEdges((eds) =>
+        eds.map((e) =>
+          e.source === node.id || e.target === node.id
+            ? {
+              ...e,
+              style: {
+                ...e.style,
+                stroke: "#ed3441",
+                strokeWidth: 3,
+                transition: "stroke 0.2s ease, stroke-width 0.2s ease",
+              },
+            }
+            : e
+        )
+      );
+    }, [setNodes, setEdges]
   );
 
   const onNodeMouseLeave = useCallback(
@@ -91,37 +118,10 @@ export default function FlowCanvas() {
           },
         }))
       );
-    },
-    [setNodes]
-  );
-  const onEdgeMouseEnter = useCallback(
-    (_: React.MouseEvent, edge: Edge) => {
       setEdges((eds) =>
-        eds.map((e) => {
-          if (e.id === edge.id) {
-            return {
-              ...e,
-              style: {
-                ...e.style,
-                stroke: "#ed3441",
-                strokeWidth: 3,
-                transition: "stroke 0.2s ease, stroke-width 0.2s ease",
-              },
-            };
-          }
-          return e;
-        })
-      );
-    },
-    [setEdges]
-  );
-
-  const onEdgeMouseLeave = useCallback(
-    (_: React.MouseEvent, edge: Edge) => {
-      setEdges((eds) =>
-        eds.map((e) => {
-          if (e.id === edge.id) {
-            return {
+        eds.map((e) =>
+          e.source === node.id || e.target === node.id
+            ? {
               ...e,
               style: {
                 ...e.style,
@@ -129,13 +129,21 @@ export default function FlowCanvas() {
                 strokeWidth: undefined,
                 transition: undefined,
               },
-            };
-          }
-          return e;
-        })
+            }
+            : e
+        )
       );
-    },
-    [setEdges]
+    }, [setNodes, setEdges]
+  );
+  const [layoutOrientation, setLayoutOrientation] = useState<LayoutOrientation>("LR");
+
+  const edgeTypes = useMemo(
+    () => ({
+      customEdge: (edgeProps: any) => {
+        return <LineageEdge {...edgeProps} layoutOrientation={layoutOrientation} key={edgeProps.id + layoutOrientation} />;
+      },
+    }),
+    [layoutOrientation]
   );
   return (
     <div style={{ width: "100%", height: "900px" }}>
@@ -146,11 +154,10 @@ export default function FlowCanvas() {
         }}
         nodes={nodes}
         edges={edges}
+        edgeTypes={edgeTypes}
         onNodesChange={onNodesChange}
         onNodeMouseEnter={onNodeMouseEnter}
         onNodeMouseLeave={onNodeMouseLeave}
-        onEdgeMouseEnter={onEdgeMouseEnter}
-        onEdgeMouseLeave={onEdgeMouseLeave}
         onEdgesChange={onEdgesChange}
         colorMode={colorMode}
         fitView

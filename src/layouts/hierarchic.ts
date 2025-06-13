@@ -1,6 +1,6 @@
 import { LayoutConfig, TraversalResult } from "@/src/interfaces";
 import { Node, Edge } from "@xyflow/react";
-import { WeightHeuristic, LayoutOrientation } from "@/src/types";
+import { LayoutOrientation } from "@/src/types";
 import { BfsTraversal, DfsTraversal } from "@/src/algorithms";
 
 export class Hierarchic {
@@ -10,11 +10,9 @@ export class Hierarchic {
   private _layoutOrientation: LayoutOrientation;
   private _connectedMap: Record<string, string[]>;
 
-  private _gridSpacing: number;
   private _horizontalSpacing: number;
   private _verticalSpacing: number;
   private _minimumLayerDistance: number;
-  private _weightHeuristic: WeightHeuristic;
 
   constructor(nodes: Node[], edges: Edge[], layoutConfig: LayoutConfig) {
     this._graphNodes = nodes;
@@ -25,11 +23,8 @@ export class Hierarchic {
     this._minimumLayerDistance = layoutConfig.minimumLayerDistance;
 
     // disable grid spacing by default
-    this._gridSpacing = 0;
     this._horizontalSpacing = layoutConfig.horizontalSpacing;
     this._verticalSpacing = layoutConfig.verticalSpacing;
-
-    this._weightHeuristic = "BARYCENTER";
   }
   get connectionMap(): Record<string, string[]> | undefined {
     return this._connectedMap;

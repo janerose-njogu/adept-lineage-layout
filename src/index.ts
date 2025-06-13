@@ -1,1 +1,1 @@
-export { HierarchicLayout } from "./layouts/index";
+export { Hierarchic } from "./layouts/index";
