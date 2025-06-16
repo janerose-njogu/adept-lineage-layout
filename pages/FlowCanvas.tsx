@@ -50,7 +50,6 @@ export default function FlowCanvas() {
         layoutConfig,
         layoutType: "hierarchic",
       }).then((positions) => {
-        console.log("Positions from worker:", positions);
         setNodes((prevNodes) =>
           prevNodes.map((node) => {
             const pos = positions[node.id];
