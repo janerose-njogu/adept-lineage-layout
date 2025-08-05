@@ -1,0 +1,192 @@
+.properties-text {
+  font-weight: bold;
+  font-size: large;
+  text-align: center;
+}
+aside::-webkit-scrollbar {
+  width: 0.5em;
+}
+
+aside::-webkit-scrollbar-thumb {
+  background-color: transparent;
+}
+
+aside::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.node-asset {
+  width: 243px;
+  height: 30px;
+  border-radius: 20px;
+  margin-left: 3px;
+  margin-right: 3px;
+  margin-bottom: 3px;
+  display: flex;
+  bottom: 0;
+  position: absolute;
+  background-color: var(--asset-bg-color);
+}
+.node-asset-text {
+  text-align: center;
+  color: var(--font-color);
+  right: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 100;
+  margin-bottom: 5px;
+  position: absolute;
+}
+.node-label-background {
+  text-align: center;
+  margin-top: 3px;
+  margin-right: 10px;
+  color: var(--font-color);
+  z-index: 100;
+  position: absolute;
+  margin-right: auto;
+  margin-left: auto;
+  right: 0;
+  left: 0;
+}
+
+.node-container {
+  height: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.node-label {
+  max-width: 70%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  overflow-wrap: break-word;
+  color: var(--font-color);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.node-tooltip {
+  height: 2rem;
+  width: 2rem;
+  font-size: 9px;
+  z-index: 100;
+  position: absolute;
+  right: 0;
+  margin-left: 0.5rem;
+  border-radius: 10%;
+}
+
+.node-tooltip-content {
+  height: 1rem;
+  width: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  margin-left: -8px;
+}
+
+.node-tooltip-content.secondary {
+  margin-top: -15px;
+  height: 1rem;
+  width: 2rem;
+}
+
+.label-icon {
+  z-index: 100;
+  height: 2rem;
+  width: 2rem;
+  margin-left: 0.5rem;
+  margin-bottom: 5.5rem;
+  background-color: transparent;
+}
+
+.tech-icon {
+  position: absolute;
+  height: 2rem;
+  width: 2rem;
+  left: 5px;
+  top: 5px;
+  z-index: 100;
+  background-color: white;
+}
+
+.change-icon {
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  right: 0;
+  top: 5px;
+  z-index: 100;
+}
+
+.handle-icon-dark {
+  height: 1.2rem;
+  width: 1.2rem;
+  color: black;
+}
+
+.handle-icon-light {
+  height: 1.2rem;
+  width: 1.2rem;
+  color: white;
+}
+.node_child {
+  border-radius: 20px;
+  width: 250px;
+  min-height: 90px;
+  background-color: var(--node-bg-color);
+}
+
+.node-text {
+  text-align: center;
+  font-weight: bold;
+  color: var(--font-color);
+  margin-top: -10px;
+}
+
+.react-flow__node,
+.react-flow__node-customNode {
+  width: 250px !important;
+  height: 90px !important;
+  border-radius: 20px;
+  background-color: var(--node-bg-color, none);
+  border: var(--node-border, none);
+  box-shadow: var(--node-box-shadow, none);
+  position: relative;
+  margin-top: -2.5px;
+  margin-left: -2.5px;
+}
+
+.react-flow__node-customNode.highlighted {
+  border: 4px solid #ff6c00;
+  box-shadow:
+    0 0 0 6px rgba(255, 108, 0, 0.18),
+    0 1px 3px 0 #ff6c00;
+  border-radius: 24px;
+  z-index: 2;
+}
+.react-flow__node-customNode .react-flow__handle {
+  width: 20px !important;
+  height: 20px !important;
+  margin-right: -5px;
+  margin-left: -5px;
+  border-radius: 10px;
+  border-color: black;
+  border-style: solid;
+  cursor: default;
+}
+
+.edge-label-container {
+  position: absolute;
+  transform: translate(-50%, -90%);
+  padding: 3px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 700;
+}
